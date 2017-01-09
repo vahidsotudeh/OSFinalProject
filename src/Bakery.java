@@ -9,6 +9,20 @@ public class Bakery {
     public void customerComesIn(){
         //TODO:Implement
         Customer customer = new Customer();
+        switch (customer.breadType){
+            case BARBARI:{
+                BarbariProducer.addQueue(customer);
+            }
+            break;
+            case LAVASH:{
+                LavashProducer.addQueue(customer);
+            }
+            break;
+            case SANGAK:{
+                SangakProducer.addQueue(customer);
+            }
+            break;
+        }
     }
 
     public Customer whoIsNext(BreadType breadType){

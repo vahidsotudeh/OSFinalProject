@@ -16,4 +16,8 @@ public class BarbariProducer extends Thread {
     public void setQueue(Queue<Customer> queue) {
         this.queue = queue;
     }
+
+    public static void addQueue(Customer customer){
+        queue.add(customer);
+    }
 }
