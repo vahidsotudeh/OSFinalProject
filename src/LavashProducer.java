@@ -6,6 +6,13 @@ import java.util.Queue;
  */
 public class LavashProducer extends Thread {
     //TODO:Lavash bakery
-    Queue<Customer> queue = new PriorityQueue<>(10);
+    static Queue<Customer> queue = new PriorityQueue<Customer>(10);
 
+    public static Queue<Customer> getQueue() {
+        return queue;
+    }
+
+    public void setQueue(Queue<Customer> queue) {
+        this.queue = queue;
+    }
 }

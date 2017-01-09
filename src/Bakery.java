@@ -8,9 +8,28 @@ public class Bakery {
 
     public void customerComesIn(){
         //TODO:Implement
+        Customer customer = new Customer();
     }
 
-    public void whoIsNext(BreadType breadType){
+    public Customer whoIsNext(BreadType breadType){
         //TODO:Implement
+        Customer customer;
+        switch (breadType){
+            case BARBARI:{
+                customer = BarbariProducer.getQueue().poll();
+            }
+                break;
+            case LAVASH:{
+                customer = LavashProducer.getQueue().poll();
+            }
+                break;
+            case SANGAK:{
+                customer = SangakProducer.getQueue().poll();
+            }
+                break;
+            default:
+                customer = null;
+        }
+        return customer;
     }
 }

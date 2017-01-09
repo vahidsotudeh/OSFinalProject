@@ -7,5 +7,13 @@ import java.util.concurrent.BlockingQueue;
  */
 public class BarbariProducer extends Thread {
     //TODO:Barbari bakery
-    Queue<Customer> queue = new PriorityQueue<>(10, new BarbariCustomerComprator());
+    static Queue<Customer> queue = new PriorityQueue<Customer>(10, new BarbariCustomerComprator());
+
+    public static Queue<Customer> getQueue() {
+        return queue;
+    }
+
+    public void setQueue(Queue<Customer> queue) {
+        this.queue = queue;
+    }
 }
