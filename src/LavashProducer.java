@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by Microsoft on 25/12/2016.
@@ -11,6 +12,8 @@ public class LavashProducer extends Thread {
     BreadType breadType;
     static Queue<Customer> queue = new ArrayDeque<Customer>(10);
     private Customer currentCustomer;
+
+    private AtomicReference<Thread> owner = new AtomicReference<Thread>();
 
     LavashProducer(){
         breadName="Lavash";
@@ -25,8 +28,10 @@ public class LavashProducer extends Thread {
         Baker_In_Back();
     }
 
-    public synchronized Customer Customer_In_Front(){
+    public Customer Customer_In_Front(){
+        lock();
         currentCustomer = Bakery.whoIsNext(BreadType.LAVASH);
+        unlock();
         return currentCustomer;
     }
 
@@ -35,25 +40,25 @@ public class LavashProducer extends Thread {
     }
 
     public void addCustomer(Customer customer) throws InterruptedException {
-        synchronized (queue) {
-            queue.add(customer);
-        }
+        lock();
+        queue.add(customer);
+        unlock();
     }
 
     public void removeCustomer() throws InterruptedException {
-        synchronized (queue) {
-            Customer customer = queue.poll();
-            System.out.println(customer.customerFinishString());
-            customer.turnTime = new Date();
-            Bakery.Compute_TurnAround_Time(customer);
-        }
+        lock();
+        Customer customer = queue.poll();
+        System.out.println(customer.customerFinishString());
+        customer.turnTime = new Date();
+        Bakery.Compute_TurnAround_Time(customer);
+        unlock();
     }
 
     public void Baker_In_Back(){
         timer = new Timer();
-        synchronized (queue) {
-            timer.schedule(new BreadProducer(), 5000, 10000);
-        }
+        lock();
+        timer.schedule(new BreadProducer(), 5000, 10000);
+        unlock();
     }
 
     class BreadProducer extends TimerTask {
@@ -72,6 +77,18 @@ public class LavashProducer extends Thread {
                 }
             }
         }
+    }
+
+    public void lock() {
+
+        Thread thread = Thread.currentThread();
+        while (!owner.compareAndSet(null, thread)) {
+        }
+    }
+
+    public void unlock() {
+        Thread thread = Thread.currentThread();
+        owner.compareAndSet(thread, null);
     }
 
 

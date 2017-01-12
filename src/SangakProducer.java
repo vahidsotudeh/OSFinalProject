@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by Microsoft on 25/12/2016.
@@ -10,6 +11,8 @@ public class SangakProducer extends Thread {
     BreadType breadType;
     static Queue<Customer> queue = new ArrayDeque<Customer>(10);
     private Customer currentCustomer;
+
+    private AtomicReference<Thread> owner = new AtomicReference<Thread>();
 
     SangakProducer(){
         breadName="Sangak";
@@ -28,8 +31,10 @@ public class SangakProducer extends Thread {
         }
     }
 
-    public synchronized Customer Customer_In_Front() throws InterruptedException {
+    public Customer Customer_In_Front() throws InterruptedException {
+        lock();
         currentCustomer = Bakery.whoIsNext(BreadType.SANGAK);
+        unlock();
         return currentCustomer;
     }
 
@@ -37,24 +42,27 @@ public class SangakProducer extends Thread {
         this.queue = queue;
     }
 
-    public synchronized void addCustomer(Customer customer) throws InterruptedException {
+    public void addCustomer(Customer customer) throws InterruptedException {
+        lock();
         queue.add(customer);
+        unlock();
     }
 
     public void removeCustomer() throws InterruptedException {
-        synchronized (queue) {
-            Customer customer = queue.poll();
-            System.out.println(customer.customerFinishString());
-            customer.turnTime = new Date();
-            Bakery.Compute_TurnAround_Time(customer);
-        }
+        lock();
+        Customer customer = queue.poll();
+        unlock();
+        System.out.println(customer.customerFinishString());
+        customer.turnTime = new Date();
+        Bakery.Compute_TurnAround_Time(customer);
     }
 
     public void Baker_In_Back() throws InterruptedException {
         timer = new Timer();
-        synchronized (queue) {
-            timer.schedule(new BreadProducer(), 5000, 10000);
-        }
+        lock();
+        timer.schedule(new BreadProducer(), 5000, 10000);
+        unlock();
+
     }
 
     class BreadProducer extends TimerTask {
@@ -73,6 +81,18 @@ public class SangakProducer extends Thread {
                 }
             }
         }
+    }
+
+    public void lock() {
+
+        Thread thread = Thread.currentThread();
+        while (!owner.compareAndSet(null, thread)) {
+        }
+    }
+
+    public void unlock() {
+        Thread thread = Thread.currentThread();
+        owner.compareAndSet(thread, null);
     }
 
 

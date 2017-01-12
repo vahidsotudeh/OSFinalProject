@@ -1,6 +1,7 @@
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by hamidrezasahraei on 24/12/16 AD.
@@ -20,6 +21,8 @@ public class BarbariProducer extends Thread {
     int maleNum = 0;
 
     boolean isRoundRobbin = true;
+
+    private AtomicReference<Thread> owner = new AtomicReference<Thread>();
 
     BarbariProducer(){
         breadName="Barbari";
@@ -42,51 +45,51 @@ public class BarbariProducer extends Thread {
         this.queue = queue;
     }
 
-    public synchronized Customer Customer_In_Front(){
+    public Customer Customer_In_Front(){
+        lock();
         if(isRoundRobbin){
             currentCustomer = Bakery.whoIsNext2(BreadType.BARBARI);
         }else {
             currentCustomer = Bakery.whoIsNext(BreadType.BARBARI);
         }
+        unlock();
 
         return currentCustomer;
     }
 
-    public synchronized void Baker_In_Back(){
+    public void Baker_In_Back(){
         timer = new Timer();
+        lock();
         timer.schedule(new BreadProducer(), 5000, 10000);
+        unlock();
     }
 
     public void addCustomer(Customer customer){
+        lock();
         if(isRoundRobbin){
-            synchronized (queue2) {
-                queue2.add(customer);
-            }
+            queue2.add(customer);
         }else {
-            synchronized (queue) {
-                queue.add(customer);
-            }
+            queue.add(customer);
         }
-
+        unlock();
     }
 
     public void removeCustomer(Customer customerRemove){
         Customer customer;
+        lock();
         if(isRoundRobbin){
-            synchronized (queue2) {
-                customer = queue2.remove(queue2.indexOf(customerRemove));
-            }
+            customer = queue2.remove(queue2.indexOf(customerRemove));
         }else {
-            synchronized (queue) {
-                customer = queue.poll();
-            }
+            customer = queue.poll();
         }
+        unlock();
         System.out.println(customer.customerFinishString());
         customer.turnTime = new Date();
         Bakery.Compute_TurnAround_Time(customer);
     }
 
-    public synchronized Customer roundRobbinAlgorithm(){
+    public Customer roundRobbinAlgorithm(){
+        lock();
         for(Customer customer : queue2){
             if(customer.breadsNumber == 1 && yekiNum < 2){
                 yekiNum++;
@@ -105,6 +108,7 @@ public class BarbariProducer extends Thread {
                 return customer;
             }
         }
+        unlock();
         yekiNum = 0;
         femaleNum = 0;
         maleNum = 0;
@@ -137,7 +141,17 @@ public class BarbariProducer extends Thread {
         }
     }
 
+    public void lock() {
 
+        Thread thread = Thread.currentThread();
+        while (!owner.compareAndSet(null, thread)) {
+        }
+    }
+
+    public void unlock() {
+        Thread thread = Thread.currentThread();
+        owner.compareAndSet(thread, null);
+    }
 
 
 }
