@@ -34,6 +34,7 @@ public class SangakProducer extends Thread {
         Customer customer = queue.poll();
         System.out.println(customer+" finished.");
         customer.turnTime = new Date();
+        Bakery.Compute_TurnAround_Time(customer);
     }
 
     public void produceBread(){

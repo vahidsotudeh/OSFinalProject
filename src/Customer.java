@@ -55,4 +55,7 @@ public class Customer extends Thread {
         return "Customer of "+bread+" Arrive at "+comesInTime+", Want "+breadsNumber+"\n";
 
     }
+    public long getTurnAroundTime(){
+        return (turnTime.getTime()-comesInTime.getTime())/1000;
+    }
 }

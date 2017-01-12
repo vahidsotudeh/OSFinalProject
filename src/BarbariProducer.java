@@ -58,6 +58,7 @@ public class BarbariProducer extends Thread {
         }
         System.out.println(customer+"Finished!");
         customer.turnTime = new Date();
+        Bakery.Compute_TurnAround_Time(customer);
     }
 
     public void produceBread(){
