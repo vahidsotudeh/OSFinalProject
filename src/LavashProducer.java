@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 /**
  * Created by Microsoft on 25/12/2016.
@@ -10,6 +11,9 @@ public class LavashProducer extends Thread {
     BreadType breadType;
     static Queue<Customer> queue = new ArrayDeque<Customer>(10);
     private Customer currentCustomer;
+
+    Semaphore semaphore = new Semaphore(0);
+    Semaphore mutex = new Semaphore(1);
 
     LavashProducer(){
         breadName="Lavash";
@@ -24,8 +28,11 @@ public class LavashProducer extends Thread {
         Baker_In_Back();
     }
 
-    public Customer Customer_In_Front(){
+    public Customer Customer_In_Front() throws InterruptedException {
+        mutex.acquire();
         currentCustomer = Bakery.whoIsNext(BreadType.LAVASH);
+        mutex.release();
+        semaphore.release();
         return currentCustomer;
     }
 
@@ -33,15 +40,21 @@ public class LavashProducer extends Thread {
         this.queue = queue;
     }
 
-    public void addCustomer(Customer customer){
+    public void addCustomer(Customer customer) throws InterruptedException {
+        mutex.acquire();
         queue.add(customer);
+        mutex.release();
+        semaphore.release();
     }
 
-    public void removeCustomer(){
+    public void removeCustomer() throws InterruptedException {
+        semaphore.acquire();
+        mutex.acquire();
         Customer customer = queue.poll();
         System.out.println(customer.customerFinishString());
         customer.turnTime = new Date();
         Bakery.Compute_TurnAround_Time(customer);
+        mutex.release();
     }
 
     public void Baker_In_Back(){
@@ -57,7 +70,11 @@ public class LavashProducer extends Thread {
                 Customer customer = Bakery.whoIsNext(breadType);
                 customer.breadsNumber--;
                 if (customer.breadsNumber == 0) {
-                    removeCustomer();
+                    try {
+                        removeCustomer();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

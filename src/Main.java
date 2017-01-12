@@ -16,7 +16,11 @@ public class Main {
         public void run() {
             int delay = (1 + new Random().nextInt(60)) * 1000;
             timer.schedule(new Task(), delay);
-            bakery.customerComesIn();
+            try {
+                bakery.customerComesIn();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

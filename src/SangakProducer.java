@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 /**
  * Created by Microsoft on 25/12/2016.
@@ -10,6 +11,9 @@ public class SangakProducer extends Thread {
     static Queue<Customer> queue = new ArrayDeque<Customer>(10);
     private Customer currentCustomer;
 
+    Semaphore semaphore = new Semaphore(0);
+    Semaphore mutex = new Semaphore(1);
+
     SangakProducer(){
         breadName="Sangak";
         breadType=BreadType.SANGAK;
@@ -20,11 +24,18 @@ public class SangakProducer extends Thread {
     }
 
     public void run(){
-        Baker_In_Back();
+        try {
+            Baker_In_Back();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    public Customer Customer_In_Front(){
+    public Customer Customer_In_Front() throws InterruptedException {
+        mutex.acquire();
         currentCustomer = Bakery.whoIsNext(BreadType.SANGAK);
+        mutex.release();
+        semaphore.release();
         return currentCustomer;
     }
 
@@ -32,18 +43,24 @@ public class SangakProducer extends Thread {
         this.queue = queue;
     }
 
-    public void addCustomer(Customer customer){
+    public void addCustomer(Customer customer) throws InterruptedException {
+        mutex.acquire();
         queue.add(customer);
+        mutex.release();
+        semaphore.release();
     }
 
-    public void removeCustomer(){
+    public void removeCustomer() throws InterruptedException {
+        semaphore.acquire();
+        mutex.acquire();
         Customer customer = queue.poll();
         System.out.println(customer.customerFinishString());
         customer.turnTime = new Date();
         Bakery.Compute_TurnAround_Time(customer);
+        mutex.release();
     }
 
-    public void Baker_In_Back(){
+    public void Baker_In_Back() throws InterruptedException {
         timer = new Timer();
         timer.schedule(new BreadProducer(),5000,10000);
     }
@@ -56,7 +73,11 @@ public class SangakProducer extends Thread {
                 Customer customer = Bakery.whoIsNext(breadType);
                 customer.breadsNumber--;
                 if (customer.breadsNumber == 0) {
-                    removeCustomer();
+                    try {
+                        removeCustomer();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

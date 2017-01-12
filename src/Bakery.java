@@ -26,7 +26,7 @@ public class Bakery {
         sangakProducer.start();
     }
 
-    public void customerComesIn(){
+    public void customerComesIn() throws InterruptedException {
         //TODO:Implement
         Customer customer = new Customer();
         System.out.println(customer.customerComeString());
@@ -103,27 +103,25 @@ public class Bakery {
     }
 
     public static void Compute_TurnAround_Time(Customer c1) {
+        System.out.println(c1);
         switch (c1.breadType) {
             case BARBARI: {
                 barbariCustomerCount++;
                 turnAroundTimeForBarbari += c1.getTurnAroundTime();
-                System.out.println(c1);
-                System.out.println("System TurnAroundTime until now: " + turnAroundTimeForBarbari / barbariCustomerCount);
+                System.out.println("System TurnAroundTime For Barbari until now: " + turnAroundTimeForBarbari / barbariCustomerCount+ " second!!");
             }
             break;
             case LAVASH: {
                 lavashCustomerCount++;
                 turnAroundTimeForLavash += c1.getTurnAroundTime();
-                System.out.println(c1);
-                System.out.println("System TurnAroundTime until now: " + turnAroundTimeForLavash / lavashCustomerCount+ " second!!");
+                System.out.println("System TurnAroundTime For Lavash until now: " + turnAroundTimeForLavash / lavashCustomerCount+ " second!!");
 
             }
             break;
             case SANGAK: {
                 sangakCustomerCount++;
                 turnAroundTimeForSangak += c1.getTurnAroundTime();
-                System.out.println(c1);
-                System.out.println("System TurnAroundTime until now: " + turnAroundTimeForSangak / sangakCustomerCount+" second!!");
+                System.out.println("System TurnAroundTime For Sangak until now: " + turnAroundTimeForSangak / sangakCustomerCount+" second!!");
 
             }
             break;

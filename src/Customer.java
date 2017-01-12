@@ -88,7 +88,12 @@ public class Customer extends Thread {
         }else {
             bread="Invalid";
         }
-        return "\nCustomer of "+bread+" Arrive at "+comesInTime+", Want "+breadsNumber+"\n";
+
+        return  "\nCustomer Leave:\n"+
+                "Gender: "+ genderString +"\n" +
+                "Bread: "+bread+"\n" +
+                "Arrival Time: "+comesInTime+"\n"+
+                "Turn Time: "+turnTime+"\n";
 
     }
     public long getTurnAroundTime(){
