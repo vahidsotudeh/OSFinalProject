@@ -11,6 +11,7 @@ public class Customer extends Thread {
     BreadType breadType;
     Date comesInTime;
     Date turnTime;
+    String genderString;
 
     //default constructor
     public Customer(){
@@ -18,8 +19,10 @@ public class Customer extends Thread {
         breadsNumber = random.nextInt(10)+1;    //between 1-10 for number of breads that customer want
         if(random.nextBoolean()){
             gender = Gender.MALE;
+            genderString = "Male";
         }else {
             gender = Gender.FEMALE;
+            genderString = "Female";
         }
         int chance = random.nextInt(3);
         if(chance == 0){
@@ -40,6 +43,39 @@ public class Customer extends Thread {
         comesInTime = new Date();
     }
 
+    public String customerComeString(){
+        String bread;
+        if(breadType==BreadType.LAVASH){
+            bread = "Lavash";
+        }else if (breadType==BreadType.SANGAK){
+            bread="Sangak";
+        }else if (breadType==BreadType.BARBARI){
+            bread="Barbari";
+        }else {
+            bread="Invalid";
+        }
+
+        return "\nCustomer Comes:\n" +
+                "Gender: "+ genderString +"\n" +
+                "Bread: "+bread+"\n" +
+                "Bread Number Want: "+breadsNumber+"\n" +
+                "Arrival Time: "+new Date()+"\n";
+    }
+
+    public String customerFinishString(){
+        String bread;
+        if(breadType==BreadType.LAVASH){
+            bread = "Lavash";
+        }else if (breadType==BreadType.SANGAK){
+            bread="Sangak";
+        }else if (breadType==BreadType.BARBARI){
+            bread="Barbari";
+        }else {
+            bread="Invalid";
+        }
+        return "\nCustomer of "+bread+" finish his/her work!\n";
+    }
+
     @Override
     public String toString() {
         String bread;
@@ -52,7 +88,7 @@ public class Customer extends Thread {
         }else {
             bread="Invalid";
         }
-        return "Customer of "+bread+" Arrive at "+comesInTime+", Want "+breadsNumber+"\n";
+        return "\nCustomer of "+bread+" Arrive at "+comesInTime+", Want "+breadsNumber+"\n";
 
     }
 }

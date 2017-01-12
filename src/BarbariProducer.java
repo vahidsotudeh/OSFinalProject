@@ -5,6 +5,7 @@ import java.util.concurrent.BlockingQueue;
  * Created by hamidrezasahraei on 24/12/16 AD.
  */
 public class BarbariProducer extends Thread {
+    Customer currentCustomer;
     Timer timer;
     String breadName;
     BreadType breadType;
@@ -34,11 +35,26 @@ public class BarbariProducer extends Thread {
     }
 
     public void run(){
-        produceBread();
+        Baker_In_Back();
     }
 
     public void setQueue(Queue<Customer> queue) {
         this.queue = queue;
+    }
+
+    public Customer Customer_In_Front(){
+        if(isRoundRobbin){
+            currentCustomer = Bakery.whoIsNext2(BreadType.BARBARI);
+        }else {
+            currentCustomer = Bakery.whoIsNext(BreadType.BARBARI);
+        }
+
+        return currentCustomer;
+    }
+
+    public void Baker_In_Back(){
+        timer = new Timer();
+        timer.schedule(new BreadProducer(),5000,10000);
     }
 
     public void addCustomer(Customer customer){
@@ -56,14 +72,8 @@ public class BarbariProducer extends Thread {
         }else {
             customer = queue.poll();
         }
-        System.out.println(customer+"Finished!");
+        System.out.println(customer.customerFinishString());
         customer.turnTime = new Date();
-    }
-
-    public void produceBread(){
-        // And From your main() method or any other method
-        timer = new Timer();
-        timer.schedule(new BreadProducer(),0,10000);
     }
 
     public Customer roundRobbinAlgorithm(){
@@ -94,20 +104,23 @@ public class BarbariProducer extends Thread {
     class BreadProducer extends TimerTask {
 
         public void run() {
-//            if(!queue.isEmpty()) {
-//                System.out.println(breadName + " Produced At "+new Date());
-//                Customer customer = Bakery.whoIsNext(breadType);
-//                customer.breadsNumber--;
-//                if (customer.breadsNumber == 0) {
-//                    removeCustomer();
-//                }
-//            }
-            if(!queue2.isEmpty()) {
-                System.out.println(breadName + " Produced At "+new Date());
-                Customer customer = Bakery.whoIsNext2(breadType);
-                customer.breadsNumber--;
-                if (customer.breadsNumber == 0) {
-                    removeCustomer(customer);
+            if(!isRoundRobbin) {
+                if (!queue.isEmpty()) {
+                    System.out.println(breadName + " Produced At " + new Date());
+                    Customer customer = Customer_In_Front();
+                    customer.breadsNumber--;
+                    if (customer.breadsNumber == 0) {
+                        removeCustomer(customer);
+                    }
+                }
+            }else {
+                if (!queue2.isEmpty()) {
+                    System.out.println(breadName + " Produced At " + new Date());
+                    Customer customer = Customer_In_Front();
+                    customer.breadsNumber--;
+                    if (customer.breadsNumber == 0) {
+                        removeCustomer(customer);
+                    }
                 }
             }
         }

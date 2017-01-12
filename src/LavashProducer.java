@@ -9,6 +9,7 @@ public class LavashProducer extends Thread {
     String breadName;
     BreadType breadType;
     static Queue<Customer> queue = new ArrayDeque<Customer>(10);
+    private Customer currentCustomer;
 
     LavashProducer(){
         breadName="Lavash";
@@ -20,7 +21,12 @@ public class LavashProducer extends Thread {
     }
 
     public void run(){
-        produceBread();
+        Baker_In_Back();
+    }
+
+    public Customer Customer_In_Front(){
+        currentCustomer = Bakery.whoIsNext(BreadType.LAVASH);
+        return currentCustomer;
     }
 
     public void setQueue(Queue<Customer> queue) {
@@ -33,21 +39,20 @@ public class LavashProducer extends Thread {
 
     public void removeCustomer(){
         Customer customer = queue.poll();
-        System.out.println(customer+" finished.");
+        System.out.println(customer.customerFinishString());
         customer.turnTime = new Date();
     }
 
-    public void produceBread(){
-        // And From your main() method or any other method
+    public void Baker_In_Back(){
         timer = new Timer();
-        timer.schedule(new BreadProducer(),0,10000);
+        timer.schedule(new BreadProducer(),5000,10000);
     }
 
     class BreadProducer extends TimerTask {
 
         public void run() {
             if(!queue.isEmpty()) {
-                System.out.println(breadName + " Produced.");
+                System.out.println(breadName + " Produced At " + new Date());
                 Customer customer = Bakery.whoIsNext(breadType);
                 customer.breadsNumber--;
                 if (customer.breadsNumber == 0) {

@@ -20,9 +20,8 @@ public class Bakery {
     }
 
     public void customerComesIn(){
-        //TODO:Implement
         Customer customer = new Customer();
-        System.out.println(customer);
+        System.out.println(customer.customerComeString());
         switch (customer.breadType){
             case BARBARI:{
                 barbariProducer.addCustomer(customer);
