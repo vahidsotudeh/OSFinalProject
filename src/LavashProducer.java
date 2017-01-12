@@ -41,6 +41,7 @@ public class LavashProducer extends Thread {
         Customer customer = queue.poll();
         System.out.println(customer.customerFinishString());
         customer.turnTime = new Date();
+        Bakery.Compute_TurnAround_Time(customer);
     }
 
     public void Baker_In_Back(){
