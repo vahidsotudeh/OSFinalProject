@@ -12,9 +12,6 @@ public class LavashProducer extends Thread {
     static Queue<Customer> queue = new ArrayDeque<Customer>(10);
     private Customer currentCustomer;
 
-    Semaphore semaphore = new Semaphore(0);
-    Semaphore mutex = new Semaphore(1);
-
     LavashProducer(){
         breadName="Lavash";
         breadType=BreadType.LAVASH;
@@ -28,11 +25,8 @@ public class LavashProducer extends Thread {
         Baker_In_Back();
     }
 
-    public Customer Customer_In_Front() throws InterruptedException {
-        mutex.acquire();
+    public synchronized Customer Customer_In_Front(){
         currentCustomer = Bakery.whoIsNext(BreadType.LAVASH);
-        mutex.release();
-        semaphore.release();
         return currentCustomer;
     }
 
@@ -41,25 +35,25 @@ public class LavashProducer extends Thread {
     }
 
     public void addCustomer(Customer customer) throws InterruptedException {
-        mutex.acquire();
-        queue.add(customer);
-        mutex.release();
-        semaphore.release();
+        synchronized (queue) {
+            queue.add(customer);
+        }
     }
 
     public void removeCustomer() throws InterruptedException {
-        semaphore.acquire();
-        mutex.acquire();
-        Customer customer = queue.poll();
-        System.out.println(customer.customerFinishString());
-        customer.turnTime = new Date();
-        Bakery.Compute_TurnAround_Time(customer);
-        mutex.release();
+        synchronized (queue) {
+            Customer customer = queue.poll();
+            System.out.println(customer.customerFinishString());
+            customer.turnTime = new Date();
+            Bakery.Compute_TurnAround_Time(customer);
+        }
     }
 
     public void Baker_In_Back(){
         timer = new Timer();
-        timer.schedule(new BreadProducer(),5000,10000);
+        synchronized (queue) {
+            timer.schedule(new BreadProducer(), 5000, 10000);
+        }
     }
 
     class BreadProducer extends TimerTask {

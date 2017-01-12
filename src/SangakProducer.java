@@ -11,9 +11,6 @@ public class SangakProducer extends Thread {
     static Queue<Customer> queue = new ArrayDeque<Customer>(10);
     private Customer currentCustomer;
 
-    Semaphore semaphore = new Semaphore(0);
-    Semaphore mutex = new Semaphore(1);
-
     SangakProducer(){
         breadName="Sangak";
         breadType=BreadType.SANGAK;
@@ -31,11 +28,8 @@ public class SangakProducer extends Thread {
         }
     }
 
-    public Customer Customer_In_Front() throws InterruptedException {
-        mutex.acquire();
+    public synchronized Customer Customer_In_Front() throws InterruptedException {
         currentCustomer = Bakery.whoIsNext(BreadType.SANGAK);
-        mutex.release();
-        semaphore.release();
         return currentCustomer;
     }
 
@@ -43,26 +37,24 @@ public class SangakProducer extends Thread {
         this.queue = queue;
     }
 
-    public void addCustomer(Customer customer) throws InterruptedException {
-        mutex.acquire();
+    public synchronized void addCustomer(Customer customer) throws InterruptedException {
         queue.add(customer);
-        mutex.release();
-        semaphore.release();
     }
 
     public void removeCustomer() throws InterruptedException {
-        semaphore.acquire();
-        mutex.acquire();
-        Customer customer = queue.poll();
-        System.out.println(customer.customerFinishString());
-        customer.turnTime = new Date();
-        Bakery.Compute_TurnAround_Time(customer);
-        mutex.release();
+        synchronized (queue) {
+            Customer customer = queue.poll();
+            System.out.println(customer.customerFinishString());
+            customer.turnTime = new Date();
+            Bakery.Compute_TurnAround_Time(customer);
+        }
     }
 
     public void Baker_In_Back() throws InterruptedException {
         timer = new Timer();
-        timer.schedule(new BreadProducer(),5000,10000);
+        synchronized (queue) {
+            timer.schedule(new BreadProducer(), 5000, 10000);
+        }
     }
 
     class BreadProducer extends TimerTask {

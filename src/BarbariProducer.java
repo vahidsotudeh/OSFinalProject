@@ -21,10 +21,6 @@ public class BarbariProducer extends Thread {
 
     boolean isRoundRobbin = true;
 
-    Semaphore semaphore = new Semaphore(0);
-    Semaphore mutex = new Semaphore(1);
-
-
     BarbariProducer(){
         breadName="Barbari";
         breadType=BreadType.BARBARI;
@@ -46,70 +42,51 @@ public class BarbariProducer extends Thread {
         this.queue = queue;
     }
 
-    public Customer Customer_In_Front(){
-        try {
-            mutex.acquire();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public synchronized Customer Customer_In_Front(){
         if(isRoundRobbin){
             currentCustomer = Bakery.whoIsNext2(BreadType.BARBARI);
         }else {
             currentCustomer = Bakery.whoIsNext(BreadType.BARBARI);
         }
-        mutex.release();
-        semaphore.release();
 
         return currentCustomer;
     }
 
-    public void Baker_In_Back(){
+    public synchronized void Baker_In_Back(){
         timer = new Timer();
-        try {
-            semaphore.acquire();
-            mutex.acquire();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        timer.schedule(new BreadProducer(),5000,10000);
-        mutex.release();
+        timer.schedule(new BreadProducer(), 5000, 10000);
     }
 
     public void addCustomer(Customer customer){
-        try {
-            mutex.acquire();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         if(isRoundRobbin){
-            queue2.add(customer);
+            synchronized (queue2) {
+                queue2.add(customer);
+            }
         }else {
-            queue.add(customer);
+            synchronized (queue) {
+                queue.add(customer);
+            }
         }
-        mutex.release();
-        semaphore.release();
+
     }
 
     public void removeCustomer(Customer customerRemove){
         Customer customer;
-        try {
-            semaphore.acquire();
-            mutex.acquire();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         if(isRoundRobbin){
-            customer = queue2.remove(queue2.indexOf(customerRemove));
+            synchronized (queue2) {
+                customer = queue2.remove(queue2.indexOf(customerRemove));
+            }
         }else {
-            customer = queue.poll();
+            synchronized (queue) {
+                customer = queue.poll();
+            }
         }
-        mutex.release();
         System.out.println(customer.customerFinishString());
         customer.turnTime = new Date();
         Bakery.Compute_TurnAround_Time(customer);
     }
 
-    public Customer roundRobbinAlgorithm(){
+    public synchronized Customer roundRobbinAlgorithm(){
         for(Customer customer : queue2){
             if(customer.breadsNumber == 1 && yekiNum < 2){
                 yekiNum++;
