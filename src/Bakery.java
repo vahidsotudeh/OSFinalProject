@@ -40,7 +40,7 @@ public class Bakery {
     }
 
     public static Customer whoIsNext(BreadType breadType){
-        //TODO:Implement
+
         Customer customer = null;
         switch (breadType){
             case BARBARI:{
@@ -61,6 +61,34 @@ public class Bakery {
                 }
             }
                 break;
+            default:
+                customer = null;
+        }
+        return customer;
+    }
+
+    public static Customer whoIsNext2(BreadType breadType){
+
+        Customer customer = null;
+        switch (breadType){
+            case BARBARI:{
+                if(!barbariProducer.getQueue2().isEmpty()) {
+                    customer = barbariProducer.roundRobbinAlgorithm();
+                }
+            }
+            break;
+            case LAVASH:{
+                if(!lavashProducer.getQueue().isEmpty()) {
+                    customer = lavashProducer.getQueue().peek();
+                }
+            }
+            break;
+            case SANGAK:{
+                if(!sangakProducer.getQueue().isEmpty()) {
+                    customer = sangakProducer.getQueue().peek();
+                }
+            }
+            break;
             default:
                 customer = null;
         }
