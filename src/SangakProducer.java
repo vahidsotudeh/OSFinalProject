@@ -8,7 +8,7 @@ public class SangakProducer extends Thread {
     //TODO:Sangak bakery
     static Queue<Customer> queue = new PriorityQueue<Customer>(10);
 
-    public static Queue<Customer> getQueue() {
+    public Queue<Customer> getQueue() {
         return queue;
     }
 
@@ -16,7 +16,4 @@ public class SangakProducer extends Thread {
         this.queue = queue;
     }
 
-    public static void addQueue(Customer customer){
-        queue.add(customer);
-    }
 }

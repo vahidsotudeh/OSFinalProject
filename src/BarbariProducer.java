@@ -9,7 +9,7 @@ public class BarbariProducer extends Thread {
     //TODO:Barbari bakery
     static Queue<Customer> queue = new PriorityQueue<Customer>(10, new BarbariCustomerComprator());
 
-    public static Queue<Customer> getQueue() {
+    public Queue<Customer> getQueue() {
         return queue;
     }
 
@@ -17,7 +17,4 @@ public class BarbariProducer extends Thread {
         this.queue = queue;
     }
 
-    public static void addQueue(Customer customer){
-        queue.add(customer);
-    }
 }
