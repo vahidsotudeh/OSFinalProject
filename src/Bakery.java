@@ -41,18 +41,24 @@ public class Bakery {
 
     public static Customer whoIsNext(BreadType breadType){
         //TODO:Implement
-        Customer customer;
+        Customer customer = null;
         switch (breadType){
             case BARBARI:{
-                customer = barbariProducer.getQueue().peek();
+                if(!barbariProducer.getQueue().isEmpty()) {
+                    customer = barbariProducer.getQueue().peek();
+                }
             }
                 break;
             case LAVASH:{
-                customer = lavashProducer.getQueue().peek();
+                if(!lavashProducer.getQueue().isEmpty()) {
+                    customer = lavashProducer.getQueue().peek();
+                }
             }
                 break;
             case SANGAK:{
-                customer = sangakProducer.getQueue().peek();
+                if(!sangakProducer.getQueue().isEmpty()) {
+                    customer = sangakProducer.getQueue().peek();
+                }
             }
                 break;
             default:

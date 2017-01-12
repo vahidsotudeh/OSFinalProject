@@ -52,7 +52,7 @@ public class Customer extends Thread {
         }else {
             bread="Invalid";
         }
-        return "Customer of "+bread+"Arrive at "+comesInTime+"\n";
+        return "Customer of "+bread+" Arrive at "+comesInTime+", Want "+breadsNumber+"\n";
 
     }
 }
