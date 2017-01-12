@@ -4,43 +4,55 @@
 public class Bakery {
     //TODO: All bakery operation should be here
     //Three bread producer each one has its own queue
-    BarbariProducer barbariProducer = new BarbariProducer();
-    LavashProducer lavashProducer = new LavashProducer();
-    SangakProducer sangakProducer = new SangakProducer();
+    static BarbariProducer barbariProducer;
+    static LavashProducer lavashProducer;
+    static SangakProducer sangakProducer;
+    Bakery(){
+        barbariProducer = new BarbariProducer();
+        lavashProducer = new LavashProducer();
+        sangakProducer = new SangakProducer();
+    }
+
+    public void startSimulation(){
+        barbariProducer.start();
+        lavashProducer.start();
+        sangakProducer.start();
+    }
 
     public void customerComesIn(){
         //TODO:Implement
         Customer customer = new Customer();
+        System.out.println(customer);
         switch (customer.breadType){
             case BARBARI:{
-                barbariProducer.getQueue().add((customer));
+                barbariProducer.addCustomer(customer);
             }
             break;
             case LAVASH:{
-                lavashProducer.getQueue().add(customer);
+                lavashProducer.addCustomer(customer);
             }
             break;
             case SANGAK:{
-                sangakProducer.getQueue().add(customer);
+                sangakProducer.addCustomer(customer);
             }
             break;
         }
     }
 
-    public Customer whoIsNext(BreadType breadType){
+    public static Customer whoIsNext(BreadType breadType){
         //TODO:Implement
         Customer customer;
         switch (breadType){
             case BARBARI:{
-                customer = barbariProducer.getQueue().poll();
+                customer = barbariProducer.getQueue().peek();
             }
                 break;
             case LAVASH:{
-                customer = lavashProducer.getQueue().poll();
+                customer = lavashProducer.getQueue().peek();
             }
                 break;
             case SANGAK:{
-                customer = sangakProducer.getQueue().poll();
+                customer = sangakProducer.getQueue().peek();
             }
                 break;
             default:

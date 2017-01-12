@@ -1,19 +1,18 @@
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Microsoft on 25/12/2016.
  */
-public class LavashProducer extends Thread {
-    //TODO:Lavash bakery
-    static Queue<Customer> queue = new PriorityQueue<Customer>(10);
+public class LavashProducer extends Producer {
 
-    public Queue<Customer> getQueue() {
-        return queue;
+    LavashProducer(){
+        breadName = "Lavash";
+        breadType = BreadType.LAVASH;
     }
 
-    public void setQueue(Queue<Customer> queue) {
-        this.queue = queue;
-    }
+
 
 }

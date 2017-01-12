@@ -1,19 +1,18 @@
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Microsoft on 25/12/2016.
  */
-public class SangakProducer extends Thread {
-    //TODO:Sangak bakery
-    static Queue<Customer> queue = new PriorityQueue<Customer>(10);
+public class SangakProducer extends Producer {
 
-    public Queue<Customer> getQueue() {
-        return queue;
+    SangakProducer(){
+        breadName = "Sangak";
+        breadType = BreadType.SANGAK;
     }
 
-    public void setQueue(Queue<Customer> queue) {
-        this.queue = queue;
-    }
+
 
 }
